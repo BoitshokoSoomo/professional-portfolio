@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boitshoko Soomo — Portfolio</title>
+<meta name="description" content="Boitshoko Soomo's Windows-style portfolio for SAP consulting, full-stack development, data dashboards, and enterprise systems.">
+<meta name="theme-color" content="#080c14">
+<meta property="og:title" content="Boitshoko Soomo — Portfolio">
+<meta property="og:description" content="A Windows-style interactive portfolio showcasing SAP, full-stack, data, and enterprise projects.">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg:#080c14;--glass:rgba(255,255,255,0.04);--glass-border:rgba(255,255,255,0.08);
+    --glass-hover:rgba(255,255,255,0.07);--taskbar:rgba(8,12,20,0.88);
+    --win-bg:#0f1623;--win-header:rgba(12,18,30,0.97);
+    --accent:#4f8ef7;--accent2:#7c5cfc;--green:#22c55e;--yellow:#f59e0b;
+    --red:#ef4444;--cyan:#06b6d4;--pink:#ec4899;
+    --text:#e8edf5;--muted:#6b7a99;--border:rgba(255,255,255,0.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  button{font:inherit;color:inherit}
+  body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:var(--text);height:100vh;overflow:hidden;user-select:none}
+  #desktop{width:100vw;height:calc(100vh - 52px);position:relative;overflow:hidden;
+    background:radial-gradient(ellipse 80% 60% at 15% 10%,rgba(79,142,247,0.09) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 50% at 85% 85%,rgba(124,92,252,0.08) 0%,transparent 55%),#080c14}
+  #desktop::before{content:'';position:absolute;inset:0;
+    background-image:linear-gradient(rgba(79,142,247,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(79,142,247,0.025) 1px,transparent 1px);
+    background-size:60px 60px;pointer-events:none}
+  .icon-grid{position:absolute;top:24px;left:24px;display:flex;flex-direction:column;flex-wrap:wrap;gap:8px;max-height:calc(100% - 48px)}
+  .icon{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 8px;border-radius:10px;cursor:pointer;width:88px;text-align:center;transition:background 0.15s;background:transparent;border:0}
+  .icon:hover,.icon:focus-visible{background:rgba(79,142,247,0.1);outline:none}
+  .icon-img{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+  .icon-label{font-size:11px;color:var(--text);text-shadow:0 1px 4px rgba(0,0,0,0.9);line-height:1.3;word-break:break-word}
+  #taskbar{position:fixed;bottom:0;left:0;right:0;height:52px;background:var(--taskbar);backdrop-filter:blur(24px);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:8px;z-index:1000}
+  #start-btn{width:36px;height:36px;border:0;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0;transition:opacity 0.15s}
+  #start-btn:hover,#start-btn:focus-visible{opacity:0.85;outline:2px solid rgba(79,142,247,0.65);outline-offset:2px}
+  .tb-div{width:1px;height:24px;background:var(--border);flex-shrink:0}
+  .tb-apps{display:flex;gap:4px;flex:1;overflow:hidden}
+  .tb-app{display:flex;align-items:center;gap:7px;padding:0 12px;height:36px;border-radius:8px;background:var(--glass);border:1px solid var(--border);cursor:pointer;font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;max-width:160px;transition:background 0.15s}
+  .tb-app:hover,.tb-app:focus-visible{background:var(--glass-hover);outline:none}
+  .tb-app.active{background:rgba(79,142,247,0.14);border-color:rgba(79,142,247,0.28)}
+  .tb-app span{overflow:hidden;text-overflow:ellipsis}
+  .tb-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .tb-link{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;font-size:14px;font-weight:700;transition:color 0.15s,background 0.15s;text-decoration:none}
+  .tb-link:hover{color:var(--text);background:var(--glass)}
+  #clock{font-size:11px;color:var(--text);text-align:right;line-height:1.5;min-width:58px;cursor:default}
+  .window{position:absolute;background:var(--win-bg);border:1px solid var(--border);border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,0.6);display:none;flex-direction:column;overflow:hidden;min-width:360px;min-height:260px}
+  .window.visible{display:flex}
+  .window.focused{box-shadow:0 32px 100px rgba(0,0,0,0.72),0 0 0 1px rgba(79,142,247,0.14)}
+  .wh{height:44px;background:var(--win-header);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:10px;cursor:grab;flex-shrink:0;touch-action:none}
+  .wh:active{cursor:grabbing}
+  .wc{display:flex;gap:6px}
+  .wb{width:12px;height:12px;border-radius:50%;cursor:pointer;border:none;flex-shrink:0;transition:opacity 0.15s}
+  .wb:hover,.wb:focus-visible{opacity:0.78;outline:2px solid rgba(255,255,255,0.35);outline-offset:2px}
+  .wclose{background:#ff5f57}.wmin{background:#febc2e}.wmax{background:#28c840}
+  .wtitle{font-size:13px;font-weight:600;color:var(--text);flex:1}
+  .wicon{font-size:15px}
+  .wb-body{flex:1;overflow-y:auto;padding:22px}
+  .wb-body::-webkit-scrollbar{width:5px}
+  .wb-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+  .ws{margin-bottom:22px}
+  .ws:last-child{margin-bottom:0}
+  .wh1{font-size:21px;font-weight:800;letter-spacing:-0.5px;margin-bottom:5px}
+  .wh2{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px}
+  .wp{font-size:13px;color:#9ba8c0;line-height:1.75}
+  .tag{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(79,142,247,0.11);color:var(--accent);margin:2px}
+  .tg{background:rgba(34,197,94,0.11);color:var(--green)}
+  .tp{background:rgba(124,92,252,0.11);color:var(--accent2)}
+  .ty{background:rgba(245,158,11,0.11);color:var(--yellow)}
+  .tc{background:rgba(6,182,212,0.11);color:var(--cyan)}
+  .ci{display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-bottom:1px solid var(--border)}
+  .ci:last-child{border-bottom:none}
+  .cicon{font-size:20px;flex-shrink:0;margin-top:1px}
+  .cname{font-size:13px;font-weight:600;margin-bottom:2px}
+  .cmeta{font-size:11px;color:var(--muted)}
+  .pstat{display:flex;gap:14px;margin-top:12px;flex-wrap:wrap}
+  .psi{font-size:12px;color:var(--muted)}
+  .psi strong{color:var(--text);display:block;font-size:15px;font-weight:800}
+  .wbr{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .wab{display:inline-flex;align-items:center;gap:6px;padding:8px 15px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:opacity 0.15s}
+  .wab:hover{opacity:0.85}
+  .ab{background:var(--accent);color:#fff}
+  .ag{background:var(--glass);color:var(--text);border:1px solid var(--border)}
+  .sbar{margin-bottom:11px}
+  .sbl{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+  .sbl span:first-child{color:var(--text);font-weight:500}
+  .sbl span:last-child{color:var(--muted)}
+  .sbt{height:5px;background:var(--border);border-radius:4px;overflow:hidden}
+  .sbf{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+  .avc{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+  .avcircle{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;flex-shrink:0}
+  .cr{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
+  .cr:last-child{border-bottom:none}
+  .cri{font-size:15px;width:22px;text-align:center}
+  .crv{color:var(--accent);text-decoration:none}
+  .tc2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .ic{background:var(--glass);border:1px solid var(--border);border-radius:8px;padding:10px 13px;font-size:13px}
+  .icl{font-size:10px;color:var(--muted);margin-bottom:2px;text-transform:uppercase;letter-spacing:0.05em}
+  #start-menu{position:fixed;bottom:60px;left:14px;width:340px;background:rgba(8,12,20,0.94);backdrop-filter:blur(32px);border:1px solid var(--border);border-radius:16px;padding:18px;z-index:2000;display:none;box-shadow:0 24px 80px rgba(0,0,0,0.65)}
+  #start-menu.open{display:block}
+  .smt{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px}
+  .smi{display:flex;align-items:center;gap:11px;width:100%;padding:9px 11px;border-radius:8px;cursor:pointer;font-size:13px;transition:background 0.12s;background:transparent;border:0;text-align:left}
+  .smi:hover,.smi:focus-visible{background:var(--glass);outline:none}
+  .smii{font-size:18px;width:26px;text-align:center}
+  .smn{font-weight:500}
+  .rh{position:absolute;bottom:0;right:0;width:18px;height:18px;cursor:se-resize;touch-action:none}
+  @media (max-width:720px){
+    body{height:100dvh}
+    #desktop{height:calc(100dvh - 58px);overflow:auto;padding-bottom:16px}
+    .icon-grid{position:relative;top:auto;left:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(86px,1fr));gap:10px;padding:16px;max-height:none}
+    .icon{width:100%;min-height:86px}
+    #taskbar{height:58px;padding:0 10px;gap:6px}
+    .tb-link{display:none}
+    #clock{min-width:52px}
+    #start-menu{left:10px;right:10px;bottom:68px;width:auto;max-height:calc(100dvh - 96px);overflow:auto}
+    .window{position:fixed;left:8px!important;top:8px!important;width:calc(100vw - 16px)!important;height:calc(100dvh - 78px)!important;min-width:0;border-radius:12px}
+    .tc2{grid-template-columns:1fr}
+    .avc{align-items:flex-start}
+  }
+</style>
+</head>
+<body>
+<div id="desktop"><div class="icon-grid" id="iconGrid"></div></div>
+<div id="taskbar">
+  <button id="start-btn" type="button" onclick="toggleStart()" aria-label="Open start menu" aria-expanded="false">⊞</button>
+  <div class="tb-div"></div>
+  <div class="tb-apps" id="tbApps"></div>
+  <div class="tb-right">
+    <a class="tb-link" href="https://github.com/BoitshokoSoomo" target="_blank" rel="noopener noreferrer" title="GitHub">GH</a>
+    <a class="tb-link" href="https://linkedin.com/in/boitshoko-soomo-13a0b7220" target="_blank" rel="noopener noreferrer" title="LinkedIn">in</a>
+    <div id="clock" aria-live="polite"></div>
+  </div>
+</div>
+<div id="start-menu"><div class="smt">All Windows</div><div id="smItems"></div></div>
+<div id="wc"></div>
+<script>
+const W=[
+  {id:"about",icon:"👤",title:"About Me",color:"#4f8ef7",bg:"linear-gradient(135deg,#4f8ef7,#7c5cfc)",w:520,h:560,body:`
+    <div class="ws"><div class="avc"><div class="avcircle">BS</div><div><div class="wh1">Boitshoko Soomo</div><div style="font-size:13px;color:var(--accent);margin-bottom:3px">SAP Consultant · Full Stack Developer</div><div style="font-size:12px;color:var(--muted)">Katlehong, Johannesburg · Available immediately</div></div></div><p class="wp">Certified SAP Technology Consultant and IBM Full Stack JavaScript Developer. I build enterprise systems and web applications that solve real business problems. Completing a BCom Business Informatics at UNISA. Open to learnerships, internships, and entry-level IT roles.</p></div>
+    <div class="ws"><div class="wh2">At a Glance</div><div class="tc2"><div class="ic"><div class="icl">Education</div>BCom Business Informatics (UNISA)</div><div class="ic"><div class="icl">Location</div>Katlehong, Johannesburg</div><div class="ic"><div class="icl">Availability</div>Immediately · Willing to relocate</div><div class="ic"><div class="icl">Languages</div>English · Setswana · Sepedi</div></div></div>
+    <div class="ws"><div class="wh2">Contact</div><div class="cr"><span class="cri">✉</span><span>Email</span><a class="crv" href="mailto:soomoboitshoko@gmail.com" style="margin-left:auto">soomoboitshoko@gmail.com</a></div><div class="cr"><span class="cri">📞</span><span>Phone</span><span class="crv" style="margin-left:auto">064 986 3484</span></div><div class="cr"><span class="cri">⎇</span><span>GitHub</span><a class="crv" href="https://github.com/BoitshokoSoomo" target="_blank" style="margin-left:auto">github.com/BoitshokoSoomo</a></div><div class="cr"><span class="cri">in</span><span>LinkedIn</span><a class="crv" href="https://linkedin.com/in/boitshoko-soomo-13a0b7220" target="_blank" style="margin-left:auto">boitshoko-soomo-13a0b7220</a></div></div>
+  `},
+  {id:"skills",icon:"⚡",title:"Skills",color:"#7c5cfc",bg:"linear-gradient(135deg,#7c5cfc,#ec4899)",w:460,h:540,body:`
+    <div class="ws"><div class="wh2">SAP &amp; Enterprise</div><div class="sbar"><div class="sbl"><span>SAP ERP / BTP / Fiori</span><span>85%</span></div><div class="sbt"><div class="sbf" style="width:85%"></div></div></div><div class="sbar"><div class="sbl"><span>Requirements Gathering</span><span>80%</span></div><div class="sbt"><div class="sbf" style="width:80%"></div></div></div><div class="sbar"><div class="sbl"><span>Solution Design</span><span>78%</span></div><div class="sbt"><div class="sbf" style="width:78%"></div></div></div></div>
+    <div class="ws"><div class="wh2">Development</div><div class="sbar"><div class="sbl"><span>JavaScript / Node.js</span><span>88%</span></div><div class="sbt"><div class="sbf" style="width:88%"></div></div></div><div class="sbar"><div class="sbl"><span>React / Express.js</span><span>82%</span></div><div class="sbt"><div class="sbf" style="width:82%"></div></div></div><div class="sbar"><div class="sbl"><span>SQL / MongoDB</span><span>78%</span></div><div class="sbt"><div class="sbf" style="width:78%"></div></div></div><div class="sbar"><div class="sbl"><span>Python / R</span><span>70%</span></div><div class="sbt"><div class="sbf" style="width:70%"></div></div></div><div class="sbar"><div class="sbl"><span>Docker / Kubernetes</span><span>60%</span></div><div class="sbt"><div class="sbf" style="width:60%"></div></div></div></div>
+    <div class="ws"><div class="wh2">Cloud &amp; Tools</div><div class="sbar"><div class="sbl"><span>Microsoft Azure (AZ-900)</span><span>75%</span></div><div class="sbt"><div class="sbf" style="width:75%"></div></div></div><div class="sbar"><div class="sbl"><span>Git / GitHub / CI-CD</span><span>80%</span></div><div class="sbt"><div class="sbf" style="width:80%"></div></div></div><div class="sbar"><div class="sbl"><span>Microsoft 365 / Excel</span><span>82%</span></div><div class="sbt"><div class="sbf" style="width:82%"></div></div></div></div>
+  `},
+  {id:"certs",icon:"🎓",title:"Certifications",color:"#f59e0b",bg:"linear-gradient(135deg,#f59e0b,#ef4444)",w:490,h:560,body:`
+    <div class="ws"><div class="wh2">Professional Certificates</div>
+    <div class="ci"><div class="cicon">🔷</div><div><div class="cname">SAP Technology Consultant</div><div class="cmeta">Coursera / SAP University Alliances · Jun 2026</div><div class="cmeta">ID: I4BGBP9Q0PUN · 7 courses</div></div></div>
+    <div class="ci"><div class="cicon">🔵</div><div><div class="cname">IBM Full-Stack JavaScript Developer</div><div class="cmeta">Coursera / IBM · Jun 2026</div><div class="cmeta">ID: 9GO7UUW6F4Q5 · 12 courses</div></div></div>
+    <div class="ci"><div class="cicon">☁️</div><div><div class="cname">Microsoft Azure Fundamentals (AZ-900)</div><div class="cmeta">Microsoft Certified</div></div></div>
+    <div class="ci"><div class="cicon">🔍</div><div><div class="cname">Google IT Support Professional</div><div class="cmeta">Coursera / Google · 5 courses</div></div></div>
+    <div class="ci"><div class="cicon">🤖</div><div><div class="cname">Generative AI</div><div class="cmeta">WeThinkCode_</div></div></div>
+    <div class="ci"><div class="cicon">💻</div><div><div class="cname">Full Stack Web Developer</div><div class="cmeta">FNB Academy</div></div></div>
+    <div class="ci"><div class="cicon">⚙️</div><div><div class="cname">SAP Associate Developer</div><div class="cmeta">Umuzi SAP Educate to Employ Programme</div></div></div>
+    <div class="ci"><div class="cicon">🛡️</div><div><div class="cname">NCV Level 4: Information Technology & Computer Science</div><div class="cmeta">Ekurhuleni West TVET College</div></div></div>
+    </div>
+  `},
+  {id:"leaveflow",icon:"📋",title:"LeaveFlow",color:"#22c55e",bg:"linear-gradient(135deg,#22c55e,#06b6d4)",w:530,h:540,body:`
+    <div class="ws"><div class="wh1">LeaveFlow</div><div style="font-size:13px;color:var(--green);margin-bottom:11px">Employee Leave Management System · Full Stack</div><p class="wp">A full-stack leave management system replacing paper forms with a digital workflow. Employees apply for leave, managers approve or reject with comments, balances update automatically, and reports give HR a full picture of team leave usage.</p><div class="pstat"><div class="psi"><strong>9</strong>API endpoints</div><div class="psi"><strong>2</strong>Role types</div><div class="psi"><strong>3</strong>Leave categories</div><div class="psi"><strong>JWT</strong>Auth</div></div></div>
+    <div class="ws"><div class="wh2">Problems Solved</div><p class="wp">Eliminates paper leave forms · Real-time balance visibility · Full approval audit trail · Prevents over-application · HR reports and payroll support</p></div>
+    <div class="ws"><div class="wh2">Tech Stack</div><span class="tag">Node.js</span><span class="tag">Express.js</span><span class="tag">JWT</span><span class="tag">bcrypt</span><span class="tag tg">REST API</span><span class="tag tg">CRUD</span><span class="tag tp">Role-based Access</span><span class="tag tc">SQL concepts</span></div>
+    <div class="wbr"><a class="wab ab" href="https://github.com/BoitshokoSoomo" target="_blank">⎇ GitHub</a></div>
+  `},
+  {id:"dashboard",icon:"📊",title:"SA Insight Dashboard",color:"#4f8ef7",bg:"linear-gradient(135deg,#3b82f6,#7c5cfc)",w:540,h:560,body:`
+    <div class="ws"><div class="wh1">SA Insight</div><div style="font-size:13px;color:var(--accent);margin-bottom:11px">South Africa Data Dashboard · 2019–2024</div><p class="wp">Interactive dashboard visualising South Africa's three critical socioeconomic datasets — unemployment, load shedding, and crime statistics — using a Python data pipeline feeding a React frontend with Recharts area and line charts.</p><div class="pstat"><div class="psi"><strong>3</strong>Datasets</div><div class="psi"><strong>6</strong>Years</div><div class="psi"><strong>9</strong>Provinces</div><div class="psi"><strong>Python</strong>Pipeline</div></div></div>
+    <div class="ws"><div class="wh2">Key Findings</div><p class="wp">Unemployment peaked at 38.9% in 2021 post-COVID · SA lost 3,288 cumulative hours to load shedding 2019–2024 · Murder declined 11.8% from 2022 to 2024</p></div>
+    <div class="ws"><div class="wh2">Tech Stack</div><span class="tag tp">Python</span><span class="tag tp">Data Pipeline</span><span class="tag">React</span><span class="tag">Recharts</span><span class="tag tg">Stats SA</span><span class="tag tg">Eskom</span><span class="tag tg">SAPS</span></div>
+    <div class="wbr"><a class="wab ab" href="https://github.com/BoitshokoSoomo" target="_blank">⎇ GitHub</a></div>
+  `},
+  {id:"footprint",icon:"🗺️",title:"Footprint Logger",color:"#06b6d4",bg:"linear-gradient(135deg,#06b6d4,#3b82f6)",w:510,h:500,body:`
+    <div class="ws"><div class="wh1">Footprint Logger</div><div style="font-size:13px;color:var(--cyan);margin-bottom:11px">Full-Stack Digital Infrastructure Mapping Tool · Deployed</div><p class="wp">A fully deployed 4-screen web application for digital infrastructure mapping. Built as a capstone project at Umuzi, managing the complete software lifecycle from requirements through to cloud production deployment. Resolved 100% of critical errors before release.</p><div class="pstat"><div class="psi"><strong>4</strong>Screens</div><div class="psi"><strong>100%</strong>Error-free</div><div class="psi"><strong>Live</strong>Deployed</div></div></div>
+    <div class="ws"><div class="wh2">Tech Stack</div><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span><span class="tag">Node.js</span><span class="tag tg">SQL</span><span class="tag tg">Production Deploy</span></div>
+    <div class="wbr"><a class="wab ab" href="https://github.com/BoitshokoSoomo/footprint-logger-platform.git" target="_blank">⎇ GitHub</a></div>
+  `},
+  {id:"bookapi",icon:"📚",title:"Book Review API",color:"#ec4899",bg:"linear-gradient(135deg,#ec4899,#f59e0b)",w:490,h:460,body:`
+    <div class="ws"><div class="wh1">Book Review API</div><div style="font-size:13px;color:var(--pink);margin-bottom:11px">RESTful API with JWT Authentication · IBM Capstone</div><p class="wp">A fully functional Express.js REST API for book reviews featuring user registration and login, JWT session management, and complete CRUD operations. Built as part of the IBM Full-Stack JavaScript Developer programme.</p><div class="pstat"><div class="psi"><strong>JWT</strong>Sessions</div><div class="psi"><strong>CRUD</strong>Operations</div><div class="psi"><strong>REST</strong>Architecture</div></div></div>
+    <div class="ws"><div class="wh2">Tech Stack</div><span class="tag">Node.js</span><span class="tag">Express.js</span><span class="tag tp">JWT Auth</span><span class="tag tg">REST API</span><span class="tag">MongoDB</span></div>
+    <div class="wbr"><a class="wab ab" href="https://github.com/BoitshokoSoomo/expressBookReviews" target="_blank">⎇ GitHub</a></div>
+  `},
+  {id:"phms",icon:"🏥",title:"Hospital System",color:"#f59e0b",bg:"linear-gradient(135deg,#f59e0b,#22c55e)",w:510,h:500,body:`
+    <div class="ws"><div class="wh1">Provincial Hospital Management System</div><div style="font-size:13px;color:var(--yellow);margin-bottom:11px">Enterprise Architecture Proposal · 4-Page Technical Document</div><p class="wp">A detailed enterprise implementation proposal for digitising public healthcare operations across South African provincial hospitals. Covers 4 operational modules with complete requirements, data workflows, and functional mapping blueprints.</p><div class="pstat"><div class="psi"><strong>4</strong>Modules</div><div class="psi"><strong>4</strong>Pages</div><div class="psi"><strong>3</strong>Month timeline</div></div></div>
+    <div class="ws"><div class="wh2">Modules Designed</div><p class="wp">Patient Records Management · Billing Automation Workflows · Pharmaceutical Inventory Tracking · System Integration Architecture</p></div>
+    <div class="ws"><div class="wh2">Skills Demonstrated</div><span class="tag ty">Business Analysis</span><span class="tag ty">Requirements Gathering</span><span class="tag">Process Mapping</span><span class="tag">Technical Writing</span><span class="tag tp">System Design</span></div>
+  `},
+];
+
+let S={};let zTop=100;let activeId=null;
+W.forEach(w=>{S[w.id]={open:false,min:false,x:80+Math.random()*100,y:40+Math.random()*60,width:w.w,height:w.h}});
+
+function safeId(id){return String(id).replace(/[^a-z0-9_-]/gi,"")}
+
+function secureExternalLinks(scope=document){
+  scope.querySelectorAll('a[target="_blank"]').forEach(a=>{
+    a.rel="noopener noreferrer";
+  });
+}
+
+function renderIcons(){
+  document.getElementById("iconGrid").innerHTML=W.map(w=>`
+    <button class="icon" type="button" onclick="openW('${safeId(w.id)}')" aria-label="Open ${w.title}">
+      <div class="icon-img" style="background:${w.bg}">${w.icon}</div>
+      <div class="icon-label">${w.title}</div>
+    </button>`).join("");
+}
+
+function renderSM(){
+  document.getElementById("smItems").innerHTML=W.map(w=>`
+    <button class="smi" type="button" onclick="openW('${safeId(w.id)}');toggleStart(false)" aria-label="Open ${w.title}">
+      <div class="smii">${w.icon}</div>
+      <div class="smn">${w.title}</div>
+    </button>`).join("");
+}
+
+function openW(id){
+  const w=W.find(x=>x.id===id),s=S[id],c=document.getElementById("wc");
+  if(!document.getElementById("win-"+id)){
+    const el=document.createElement("div");
+    el.className="window";el.id="win-"+id;
+    el.style.cssText=`left:${s.x}px;top:${s.y}px;width:${s.width}px;height:${s.height}px;z-index:${++zTop}`;
+    el.innerHTML=`<div class="wh" onpointerdown="startDrag(event,'${id}')"><div class="wc"><button class="wb wclose" type="button" onclick="closeW('${id}')" aria-label="Close ${w.title}"></button><button class="wb wmin" type="button" onclick="minW('${id}')" aria-label="Minimize ${w.title}"></button><button class="wb wmax" type="button" onclick="maxW('${id}')" aria-label="Maximize ${w.title}"></button></div><span class="wicon">${w.icon}</span><div class="wtitle">${w.title}</div></div><div class="wb-body">${w.body}</div><div class="rh" onpointerdown="startResize(event,'${id}')" aria-hidden="true"></div>`;
+    el.addEventListener("pointerdown",()=>focusW(id));
+    c.appendChild(el);
+    secureExternalLinks(el);
+  }
+  S[id].open=true;S[id].min=false;
+  document.getElementById("win-"+id).classList.add("visible");
+  focusW(id);updateTB();
+}
+
+function closeW(id){
+  S[id].open=false;
+  document.getElementById("win-"+id)?.classList.remove("visible");
+  if(activeId===id)activeId=null;
+  updateTB();
+}
+function minW(id){
+  S[id].min=true;
+  document.getElementById("win-"+id)?.classList.remove("visible");
+  if(activeId===id)activeId=null;
+  updateTB();
+}
+
+let mx={};
+function maxW(id){
+  const el=document.getElementById("win-"+id);if(!el)return;
+  if(mx[id]){el.style.left=S[id].x+"px";el.style.top=S[id].y+"px";el.style.width=S[id].width+"px";el.style.height=S[id].height+"px";el.style.borderRadius="";mx[id]=false}
+  else{
+    const r=el.getBoundingClientRect();
+    S[id].x=r.left;S[id].y=r.top;S[id].width=r.width;S[id].height=r.height;
+    el.style.cssText+=";left:0;top:0;width:100vw;height:calc(100vh - 52px);border-radius:0";
+    mx[id]=true;
+  }
+}
+
+function focusW(id){
+  activeId=id;
+  document.querySelectorAll(".window").forEach(w=>w.classList.remove("focused"));
+  const el=document.getElementById("win-"+id);
+  if(el){el.classList.add("focused");el.style.zIndex=++zTop}
+  document.querySelectorAll(".tb-app").forEach(a=>a.classList.remove("active"));
+  document.getElementById("tb-"+id)?.classList.add("active");
+}
+
+function updateTB(){
+  document.getElementById("tbApps").innerHTML=W.filter(w=>S[w.id].open).map(w=>`
+    <button class="tb-app ${activeId===w.id&&!S[w.id].min?'active':''}" type="button" id="tb-${w.id}" onclick="tbClick('${w.id}')" aria-label="${S[w.id].min?'Restore':'Minimize'} ${w.title}">
+      <span>${w.icon}</span><span>${w.title}</span>
+    </button>`).join("");
+}
+
+function tbClick(id){S[id].min?openW(id):minW(id)}
+
+let drag=null;
+function startDrag(e,id){
+  if(e.target.classList.contains("wb"))return;
+  if(mx[id])return;
+  const r=document.getElementById("win-"+id).getBoundingClientRect();
+  drag={id,ox:e.clientX-r.left,oy:e.clientY-r.top};focusW(id);e.preventDefault();
+  e.currentTarget.setPointerCapture?.(e.pointerId);
+}
+document.addEventListener("pointermove",e=>{
+  if(drag){const el=document.getElementById("win-"+drag.id);
+    const nx=Math.max(0,Math.min(e.clientX-drag.ox,window.innerWidth-100));
+    const ny=Math.max(0,Math.min(e.clientY-drag.oy,window.innerHeight-100));
+    el.style.left=nx+"px";el.style.top=ny+"px";S[drag.id].x=nx;S[drag.id].y=ny;}
+  if(rsz){const el=document.getElementById("win-"+rsz.id);
+    const width=Math.max(360,rsz.sw+e.clientX-rsz.sx);
+    const height=Math.max(260,rsz.sh+e.clientY-rsz.sy);
+    el.style.width=width+"px";el.style.height=height+"px";
+    S[rsz.id].width=width;S[rsz.id].height=height;}
+});
+document.addEventListener("pointerup",()=>{drag=null;rsz=null});
+document.addEventListener("pointercancel",()=>{drag=null;rsz=null});
+
+let rsz=null;
+function startResize(e,id){
+  if(mx[id])return;
+  const r=document.getElementById("win-"+id).getBoundingClientRect();
+  rsz={id,sx:e.clientX,sy:e.clientY,sw:r.width,sh:r.height};focusW(id);e.preventDefault();e.stopPropagation();
+  e.currentTarget.setPointerCapture?.(e.pointerId);
+}
+
+function toggleStart(force){
+  const menu=document.getElementById("start-menu");
+  const isOpen=typeof force==="boolean"?force:!menu.classList.contains("open");
+  menu.classList.toggle("open",isOpen);
+  document.getElementById("start-btn").setAttribute("aria-expanded",String(isOpen));
+}
+document.addEventListener("click",e=>{
+  if(!e.target.closest("#start-menu")&&!e.target.closest("#start-btn"))
+    toggleStart(false);
+});
+
+function updateClock(){
+  const n=new Date();
+  document.getElementById("clock").innerHTML=
+    n.toLocaleTimeString("en-ZA",{hour:"2-digit",minute:"2-digit"})+"<br>"+
+    n.toLocaleDateString("en-ZA",{day:"numeric",month:"short"});
+}
+setInterval(updateClock,1000);updateClock();
+renderIcons();renderSM();
+setTimeout(()=>openW("about"),300);
+</script>
+</body>
+</html>
